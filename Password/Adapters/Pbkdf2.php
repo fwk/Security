@@ -3,11 +3,11 @@ namespace Fwk\Security\Password\Adapters;
 
 use Zend\Crypt\Key\Derivation\Pbkdf2 as ZendPbkdf2;
 use Zend\Math\Rand;
-use Fwk\Security\Password\SaltedPasswordInterface;
+use Fwk\Security\Password\SaltedPassword;
 
 /**
  */
-class Pbkdf2 implements SaltedPasswordInterface
+class Pbkdf2 implements SaltedPassword
 {
     protected $salt;
     protected $hash         = 'sha256';

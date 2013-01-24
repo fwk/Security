@@ -3,7 +3,7 @@ namespace Fwk\Security\Password;
 
 use Zend\Crypt\Password\PasswordInterface;
 
-interface SaltedPasswordInterface extends PasswordInterface
+interface SaltedPassword extends PasswordInterface
 {
     public function getSalt();
 

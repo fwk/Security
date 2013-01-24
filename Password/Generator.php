@@ -1,7 +1,7 @@
 <?php
 namespace Fwk\Security\Password;
 
-class Generator implements SaltedPasswordInterface
+class Generator implements SaltedPassword
 {
     /**
      * The Password Adapter name
@@ -97,7 +97,7 @@ class Generator implements SaltedPasswordInterface
     public function getSalt()
     {
         $adapter = $this->getAdapter();
-        if ($adapter instanceof SaltedPasswordInterface) {
+        if ($adapter instanceof SaltedPassword) {
             return $adapter->getSalt();
         }
 
@@ -114,7 +114,7 @@ class Generator implements SaltedPasswordInterface
     public function setSalt($salt)
     {
         $adapter = $this->getAdapter();
-        if ($adapter instanceof SaltedPasswordInterface) {
+        if ($adapter instanceof SaltedPassword) {
             $adapter->setSalt($salt);
         }
 

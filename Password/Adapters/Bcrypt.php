@@ -1,13 +1,13 @@
 <?php
 namespace Fwk\Security\Password\Adapters;
 
-use Fwk\Security\Password\SaltedPasswordInterface;
+use Fwk\Security\Password\SaltedPassword;
 use Zend\Crypt\Password\Bcrypt as ZendBcrypt;
 use Zend\Math\Rand;
 
 /**
  */
-class Bcrypt extends ZendBcrypt implements SaltedPasswordInterface
+class Bcrypt extends ZendBcrypt implements SaltedPassword
 {
     public function create($password)
     {
