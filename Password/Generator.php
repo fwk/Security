@@ -1,7 +1,5 @@
 <?php
-namespace Password;
-
-use Password\SaltedPasswordInterface;
+namespace Fwk\Security\Password;
 
 class Generator implements SaltedPasswordInterface
 {

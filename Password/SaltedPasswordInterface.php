@@ -1,5 +1,5 @@
 <?php
-namespace Password;
+namespace Fwk\Security\Password;
 
 use Zend\Crypt\Password\PasswordInterface;
 

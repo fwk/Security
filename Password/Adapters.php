@@ -1,5 +1,5 @@
 <?php
-namespace Password;
+namespace Fwk\Security\Password;
 
 final class Adapters
 {
