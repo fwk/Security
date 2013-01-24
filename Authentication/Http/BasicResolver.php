@@ -27,7 +27,8 @@ class BasicResolver extends UserProviderResolver
         }
         
         return array(
-            'user'          => $user
+            'identifier'    => $user->getIdentifier(),
+            'username'      => $user->getUsername()
         );
     }
 }
