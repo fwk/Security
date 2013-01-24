@@ -179,4 +179,14 @@ class Memory implements Provider, \IteratorAggregate, \Countable
     {
         return true;
     }
+    
+    /**
+     * Factory method.
+     * 
+     * @return Memory 
+     */
+    public static function factory()
+    {
+        return new self;
+    }
 }

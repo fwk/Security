@@ -5,3 +5,4 @@ vendor
 /build/
 /app
 /composer.lock
+/.htaccess

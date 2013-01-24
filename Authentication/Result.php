@@ -8,4 +8,15 @@ use Zend\Authentication\Result as ResultBase;
  */
 class Result extends ResultBase
 {
+    /**
+     *
+     * @param ResultBase $zendResult
+     * @return Result
+     */
+    public static function factory(ResultBase $zendResult)
+    {
+        $class = new self($zendResult->getCode(), $zendResult->getIdentity(), $zendResult->getMessages());
+
+        return $class;
+    }
 }

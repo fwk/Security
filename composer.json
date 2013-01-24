@@ -23,7 +23,8 @@
         "symfony/http-foundation": "dev-master",
         "zendframework/zend-authentication": "2.*",
         "zendframework/zend-permissions-acl": "2.*",
-        "zendframework/zend-crypt": "2.*"
+        "zendframework/zend-crypt": "2.*",
+        "zendframework/zend-http": "2.*"
     },
     "autoload": {
         "psr-0": {
