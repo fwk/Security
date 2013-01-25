@@ -34,4 +34,28 @@ abstract class UserProviderResolver implements ResolverInterface
      * @return array|false
      */
     abstract public function resolve($username, $realm, $password = null);
+    
+    /**
+     * Returns the User Provider
+     * 
+     * @return Provider 
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
+
+    /**
+     * Defines the User Provider
+     * 
+     * @param Provider $provider User Provider
+     * 
+     * @return UserProviderResolver 
+     */
+    public function setProvider(Provider $provider) 
+    {
+        $this->provider = $provider;
+        
+        return $this;
+    }
 }
