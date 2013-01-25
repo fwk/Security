@@ -9,7 +9,7 @@ class SecurityService
     /**
      * The User Entity
      * 
-     * @var mixed
+     * @var User
      */
     protected $user;
     
@@ -28,8 +28,22 @@ class SecurityService
     protected $authenticationManager;
     
     /**
+     * Constructor
+     * 
+     * @param AuthManager  $manager  The Authentification Manager
+     * @param UserProvider $provider The User Provider
+     * 
+     * @return void
+     */
+    public function __construct(AuthManager $manager, UserProvider $provider)
+    {
+        $this->authenticationManager    = $manager;
+        $this->userProvider             = $provider;
+    }
+    
+    /**
      *
-     * @return mixed
+     * @return User
      */
     public function getUser()
     {

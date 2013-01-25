@@ -74,10 +74,10 @@ class SessionStorage implements StorageInterface
     public function isEmpty()
     {
         if (!$this->session->isStarted()) {
-            return true;
+            $this->session->start();
         }
         
-        return $this->session->isEmpty();
+        return $this->session->has(self::SESSION_STO_KEY);
     }
     
     /**
