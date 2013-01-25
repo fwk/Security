@@ -4,7 +4,10 @@ namespace Fwk\Security;
 use Fwk\Security\Authentication\Manager as AuthManager;
 use Fwk\Security\Acl\Manager as AclManager;
 use Fwk\Security\User\Provider as UserProvider;
+use Fwk\Security\Exceptions\AuthenticationException;
 use Fwk\Events\Dispatcher;
+use Zend\Authentication\Result as ZendResult;
+use Symfony\Component\HttpFoundation\Request;
 
 class Service extends Dispatcher
 {
@@ -46,8 +49,8 @@ class Service extends Dispatcher
      * @return void
      */
     public function __construct(AuthManager $manager, UserProvider $provider,
-        AclManager $aclManager = null)
-    {
+        AclManager $aclManager = null
+    ) {
         $this->authenticationManager    = $manager;
         $this->userProvider             = $provider;
         $this->aclManager               = $aclManager;
@@ -57,10 +60,52 @@ class Service extends Dispatcher
      *
      * @return User
      */
-    public function getUser()
+    public function getUser(Request $request = null)
     {
         if (!isset($this->user)) {
+            $this->notifyEvent(
+                Events::BEFORE_AUTHENTICATION, array('request' => $request)
+            );
 
+            $result = $this->authenticationManager->authenticate();
+            $this->notifyEvent(Events::AFTER_AUTHENTICATION, array(
+                'request'   => $request,
+                'result'    => $result
+            ));
+
+            if (!$result->isValid() || $result->getCode() !== ZendResult::SUCCESS) {
+                $this->notifyEvent(Events::AUTHENTICATION_ERROR, array(
+                    'request'   => $request,
+                    'result'    => $result,
+                    'messages'  => $result->getMessages()
+                ));
+                return null;
+            }
+
+            $identity = $result->getIdentity();
+            if (isset($identity['identifier'])) {
+                $user = $this->userProvider->getById($identity['identifier']);
+            } elseif (isset($identity['username'])) {
+                $user = $this->userProvider->getByUsername(
+                    $identity['username'],
+                    true
+                );
+            } else {
+                $this->notifyEvent(Events::AUTHENTICATION_ERROR, array(
+                    'request'   => $request,
+                    'result'    => $result,
+                    'message'   => 'invalid identity recieved (no identifier or username)'
+                ));
+                return null;
+            }
+
+            $this->notifyEvent(Events::AUTHENTICATION_SUCCESS, array(
+                'request'   => $request,
+                'result'    => $result,
+                'user'      => $user
+            ));
+
+            $this->user = $user;
         }
 
         return $this->user;
@@ -136,5 +181,18 @@ class Service extends Dispatcher
         $this->aclManager = $aclManager;
 
         return $this;
+    }
+
+    /**
+     * Notifies a SecurityEvent
+     *
+     * @param string $eventName
+     * @param array  $data
+     *
+     * @return void
+     */
+    protected function notifyEvent($eventName, array $data = array())
+    {
+        $this->notify(SecurityEvent::factory($eventName, $this, $data));
     }
 }
