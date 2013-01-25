@@ -151,7 +151,7 @@ class SessionStorage implements StorageInterface
                 break;
             
             default:
-                 throw new \InvalidArgumentException(
+                 throw new \RuntimeException(
                      'Session strategy should be "migrate" or "invalidate"'
                  );
         }
