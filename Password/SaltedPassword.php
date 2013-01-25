@@ -8,4 +8,6 @@ interface SaltedPassword extends PasswordInterface
     public function getSalt();
 
     public function setSalt($salt);
+
+    public function clearSalt();
 }

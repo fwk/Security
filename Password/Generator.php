@@ -120,4 +120,14 @@ class Generator implements SaltedPassword
 
         return $this;
     }
+
+    public function clearSalt()
+    {
+        $adapter = $this->getAdapter();
+        if ($adapter instanceof SaltedPassword) {
+            $adapter->clearSalt();
+        }
+
+        return $this;
+    }
 }

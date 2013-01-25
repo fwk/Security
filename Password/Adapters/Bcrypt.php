@@ -16,10 +16,10 @@ class Bcrypt extends ZendBcrypt implements SaltedPassword
         } else {
             $salt = $this->salt;
         }
-        
+
         return parent::create($password);
     }
-    
+
     public function clearSalt()
     {
         unset($this->salt);
