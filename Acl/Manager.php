@@ -42,9 +42,14 @@ class Manager extends Acl
         $roles = $this->provider->getRoles();
         foreach ($roles as $data) {
             $this->addRole($data['role'], $data['parents']);
+            
             $resources = $this->provider->getResources($data['role']);
             foreach ($resources as $data) {
-                 $this->addResource($data['resource'], $data['parents']);
+                if ($this->hasResource($data['resource'])) {
+                    continue;
+                }
+                
+                $this->addResource($data['resource'], $data['parents']);
             }
         }
     }

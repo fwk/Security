@@ -89,8 +89,8 @@ class Memory implements Provider
         foreach ($resources as $data) {
             if (is_array($data) && isset($data['resource'])) {
                 $this->addResource(
-                        $data['resource'], 
-                        (isset($data['parents']) ? $data['parents'] : null)
+                    $data['resource'], 
+                    (isset($data['parents']) ? $data['parents'] : null)
                 );
             } 
             // it's a role with no parent
@@ -128,7 +128,6 @@ class Memory implements Provider
     
     public function getResources(RoleInterface $role)
     {
-        
         return $this->resources;
     }
     
