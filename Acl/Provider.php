@@ -2,14 +2,17 @@
 namespace Fwk\Security\Acl;
 
 use Fwk\Security\User;
+use Zend\Permissions\Acl\Role\RoleInterface;
 
 interface Provider
 {
-    public function getAllRoles();
+    public function getRoles();
 
     public function getUserRoles(User $user);
 
-    public function getAllResources();
+    public function getResources(RoleInterface $role);
+    
+    public function getResourcesAll();
 
-    public function getUserResources(User $user);
+    public function getRoleResources($role);
 }

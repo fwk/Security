@@ -260,4 +260,46 @@ class PasswordAdapter implements AdapterInterface
 
         return $this;
     }
+    
+    /**
+     * Returns the salt generation closure (if any)
+     * 
+     * @return \Closure
+     */
+    public function getSaltClosure()
+    {
+        return $this->saltClosure;
+    }
+
+    /**
+     * Defines a salt generation \Closure.
+     * 
+     * This function takes a User interface parameter and should 
+     * return the according salt string.
+     * 
+     * To be the safer, you might want to find an efficent way
+     * to have a unique salt for each User in your application. Storing it 
+     * unencrypted isn't the best level of security and this function is here
+     * to let you find a way to generate a unique salt according to known-User 
+     * data. 
+     * 
+     * NOTE: You should re-use this logic/function everytime you need to check
+     * or create a user password (and this is where things are becoming 
+     * interesting). 
+     * 
+     * This kind of security is only required for critical-level applications 
+     * like Banking or eCommerce. Passwords encrypted with strong
+     * algorythms with an unique salt for all are already very very hard to 
+     * crack/brute-force.
+     * 
+     * @param \Closure $saltClosure The Salt Generation \Closure
+     * 
+     * @return PasswordAdapter 
+     */
+    public function setSaltClosure(\Closure $saltClosure)
+    {
+        $this->saltClosure = $saltClosure;
+        
+        return $this;
+    }
 }

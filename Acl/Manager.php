@@ -10,16 +10,53 @@ class Manager extends Acl
      * 
      * @var Provider
      */
-    protected $aclProvider;
+    protected $provider;
+    
+    /**
+     * Constructor
+     * 
+     * @param Provider $aclProvider The Acl Provider
+     * 
+     * @return void
+     */
+    public function __construct(Provider $aclProvider = null)
+    {
+        $this->provider = $aclProvider;
+        
+        if (null !== $aclProvider) {
+            $this->loadFromProvider();
+        }
+    }
+    
+    /**
+     * Loads ACLs from the Provider
+     * 
+     * @return void 
+     */ 
+    protected function loadFromProvider()
+    {
+        if (!isset($this->provider)) {
+            return;
+        }
+        
+        $roles = $this->provider->getRoles();
+        foreach ($roles as $data) {
+            $this->addRole($data['role'], $data['parents']);
+            $resources = $this->provider->getResources($data['role']);
+            foreach ($resources as $data) {
+                 $this->addResource($data['resource'], $data['parents']);
+            }
+        }
+    }
     
     /**
      * Sets the Acl Provider
      * 
      * @return Provider
      */
-    public function getAclProvider() 
+    public function getProvider() 
     {
-        return $this->aclProvider;
+        return $this->provider;
     }
 
     /**
@@ -29,9 +66,9 @@ class Manager extends Acl
      * 
      * @return Manager 
      */
-    public function setAclProvider(Provider $aclProvider) 
+    public function setProvider(Provider $aclProvider) 
     {
-        $this->aclProvider = $aclProvider;
+        $this->provider = $aclProvider;
         
         return $this;
     }
