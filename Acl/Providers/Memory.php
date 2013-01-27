@@ -128,7 +128,29 @@ class Memory implements Provider
     
     public function getResources(RoleInterface $role)
     {
-        return $this->resources;
+        $return = array();
+        
+        foreach ($this->permissions as $perm) {
+            if ($perm['role'] instanceof RoleInterface 
+                && $role->getRoleId() != $perm['role']->getRoleId()
+            ) {
+                continue;
+            } elseif (is_string($perm['role']) 
+                    && $role->getRoleId() != $perm['role']
+            ) {
+                continue;
+            } elseif (null === $perm['resource']) {
+                continue;
+            }
+            
+            if (is_string($perm['resource'])) {
+                array_push($return, $this->resources[$perm['resource']]);
+            } elseif ($perm['resource'] instanceof ResourceInterface) {
+                array_push($return, $this->resources[$perm['resource']->getResourceId()]);
+            } 
+        }
+        
+        return $return;
     }
     
     public function getUserRoles(User $user)
@@ -139,5 +161,59 @@ class Memory implements Provider
     public function getRoleResources($role)
     {
         return array();
+    }
+    
+    public function addPermission($role, $rule = Provider::PERMISSION_ALLOW, 
+        $resource = null, $what = null, $assert = null
+    ) {
+        $this->permissions[] = array(
+            'role'  => $role,
+            'rule'  => $rule,
+            'resource'  => $resource,
+            'what'  => $what,
+            'assert' => $assert
+        );
+        
+        return $this;
+    }
+    
+    public function addPermissions(array $permissions)
+    {
+        foreach ($permissions as $permission) {
+            $this->addPermission(
+                (isset($permission['role']) ? $permission['role'] : null), 
+                (isset($permission['rule']) ? $permission['rule'] : null), 
+                (isset($permission['resource']) ? $permission['resource'] : null), 
+                (isset($permission['what']) ? $permission['what'] : null),
+                (isset($permission['assert']) ? $permission['assert'] : null)
+            );
+        }
+        
+        return $this;
+    }
+    
+    public function getPermissions(RoleInterface $role)
+    {
+        $final = array();
+        foreach ($this->permissions as $perm) {
+            if ($perm['role'] instanceof RoleInterface 
+                && $role->getRoleId() != $perm['role']->getRoleId()
+            ) {
+                continue;
+            } elseif (is_string($perm['role']) 
+                    && $role->getRoleId() != $perm['role']
+            ) {
+                continue;
+            } 
+            
+            array_push($final, $perm);
+        }
+        
+        return $final;
+    }
+    
+    public function getPermissionsAll()
+    {
+        return $this->permissions;
     }
 }

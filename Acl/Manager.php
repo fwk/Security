@@ -2,9 +2,12 @@
 namespace Fwk\Security\Acl;
 
 use Zend\Permissions\Acl\Acl;
+use Zend\Permissions\Acl\Role\RoleInterface;
 
 class Manager extends Acl
 {
+    const DYNAMIC_CHAR = ':';
+    
     /**
      * Acl Provider
      * 
@@ -24,7 +27,7 @@ class Manager extends Acl
         $this->provider = $aclProvider;
         
         if (null !== $aclProvider) {
-            $this->loadFromProvider();
+            $this->load($aclProvider, false);
         }
     }
     
@@ -33,25 +36,73 @@ class Manager extends Acl
      * 
      * @return void 
      */ 
-    protected function loadFromProvider()
+    public function load(Provider $provider, $dynamics = false)
     {
-        if (!isset($this->provider)) {
-            return;
+        $roles = $provider->getRoles();
+        foreach ($roles as $data) {
+            if ($this->hasRole($data['role'])) {
+                continue;
+            }
+            
+            $this->addRole($data['role'], $data['parents']);
         }
         
-        $roles = $this->provider->getRoles();
-        foreach ($roles as $data) {
-            $this->addRole($data['role'], $data['parents']);
-            
-            $resources = $this->provider->getResources($data['role']);
-            foreach ($resources as $data) {
-                if ($this->hasResource($data['resource'])) {
-                    continue;
-                }
-                
-                $this->addResource($data['resource'], $data['parents']);
-            }
+        $this->loadResources($provider, null);
+        $this->loadPermissions($provider, null, $dynamics);
+    }
+    
+    public function loadResources(Provider $provider, 
+        RoleInterface $role = null
+    ) {
+        if (null === $role) {
+            $resources = $provider->getResourcesAll();
+        } else {
+            $resources = $provider->getResources($role);
         }
+        
+        foreach ($resources as $data) {
+            if ($this->hasResource($data['resource'])) {
+                continue;
+            }
+            
+            $this->addResource($data['resource'], $data['parents']);
+        }
+    }
+    
+    public function loadPermissions(Provider $provider, 
+        RoleInterface $role = null, $dynamics = false
+    ) {
+        if (null === $role) {
+            $perms = $provider->getPermissionsAll();
+        } else {
+            $perms = $provider->getPermissions($role);
+        }
+        
+        foreach ($perms as $permission) {
+            $roleStr = ($permission['role'] instanceof RoleInterface ? 
+                $permission['role']->getRoleId() : 
+                $permission['role']
+            );
+            
+            if (strpos($roleStr, self::DYNAMIC_CHAR) !== false 
+                    && !$dynamics) {
+                continue;
+            } 
+            
+            $this->setRule(
+                self::OP_ADD, 
+                $permission['rule'], 
+                $permission['role'], 
+                $permission['resource'], 
+                $permission['what'], 
+                $permission['assert']
+            );
+        }
+    }
+    
+    public function hasProvider()
+    {
+        return ($this->provider instanceof Provider);
     }
     
     /**

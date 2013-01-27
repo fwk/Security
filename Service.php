@@ -8,6 +8,7 @@ use Fwk\Security\Exceptions\AuthenticationException;
 use Fwk\Events\Dispatcher;
 use Zend\Authentication\Result as ZendResult;
 use Symfony\Component\HttpFoundation\Request;
+use Fwk\Security\User\AclAware;
 
 class Service extends Dispatcher
 {
