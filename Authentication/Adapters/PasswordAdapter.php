@@ -7,7 +7,8 @@ use Zend\Authentication\Adapter\AdapterInterface;
 use Fwk\Security\Exceptions\UserNotFound;
 use Fwk\Security\Exceptions\UserProviderException;
 use Zend\Authentication\Result;
-use Fwk\Security\Accessor;
+use Fwk\Security\Exceptions\AuthenticationException;
+use Fwk\Security\User\PasswordAware;
 
 class PasswordAdapter implements AdapterInterface
 {
@@ -40,13 +41,6 @@ class PasswordAdapter implements AdapterInterface
     protected $provider;
 
     /**
-     * Property of the User object where is stored the crypted password
-     *
-     * @var string
-     */
-    protected $passwordProperty;
-
-    /**
      * Closure function to calculate the password's salt
      *
      * @var \Closure
@@ -60,21 +54,18 @@ class PasswordAdapter implements AdapterInterface
      * @param string    $password         Submitted password
      * @param Generator $generator        Password generator
      * @param Provider  $userProvider     User Provider
-     * @param string    $passwordProperty Property of the User object where is
-     * stored the crypted password
      * @param \Closure  $saltClosure      A closure or callable that returns the
      * salt. Takes an User as the only argument. Only works with SaltedPassword.
      *
      * @return void
      */
     public function __construct($username, $password, Generator $generator,
-        Provider $userProvider, $passwordProperty, \Closure $saltClosure = null
+        Provider $userProvider, \Closure $saltClosure = null
     ) {
         $this->username         = $username;
         $this->password         = $password;
         $this->generator        = $generator;
         $this->provider         = $userProvider;
-        $this->passwordProperty = $passwordProperty;
         $this->saltClosure      = $saltClosure;
     }
 
@@ -101,8 +92,14 @@ class PasswordAdapter implements AdapterInterface
             );
         }
 
-        $accessor = new Accessor($user);
-        $crypted  = $accessor->get($this->passwordProperty);
+        if (!$user instanceof PasswordAware) {
+            throw new AuthenticationException(
+                'User must implements PasswordAware interface to use this '. 
+                'Authtentication Adapter.'
+            );
+        }
+        
+        $crypted  = $user->getPassword();
         if (false === $crypted) {
             return new Result(
                 Result::FAILURE_UNCATEGORIZED,
@@ -147,22 +144,19 @@ class PasswordAdapter implements AdapterInterface
      * @param string    $password         Submitted password
      * @param Generator $generator        Password generator
      * @param Provider  $userProvider     User Provider
-     * @param string    $passwordProperty Property of the User object where is
-     * stored the crypted password
      * @param \Closure  $saltClosure      A closure or callable that returns the
      * salt. Takes an User as the only argument. Only works with SaltedPassword.
      *
      * @return PasswordAdapter
      */
     public static function factory($username, $password, Generator $generator,
-        Provider $userProvider, $passwordProperty, \Closure $saltClosure = null
+        Provider $userProvider, \Closure $saltClosure = null
     ) {
         return new self(
             $username,
             $password,
             $generator,
             $userProvider,
-            $passwordProperty,
             $saltClosure
         );
     }
@@ -235,32 +229,6 @@ class PasswordAdapter implements AdapterInterface
         return $this;
     }
 
-    /**
-     * Returns the password Property of the User object used to retrieve the
-     * crypted password for comparision
-     *
-     * @return string
-     */
-    public function getPasswordProperty()
-    {
-        return $this->passwordProperty;
-    }
-
-    /**
-     * Defines the Password property of the User object where is stored the
-     * crypted password
-     *
-     * @param string $passwordProperty Property of the User object
-     *
-     * @return PasswordAdapter
-     */
-    public function setPasswordProperty($passwordProperty)
-    {
-        $this->passwordProperty = $passwordProperty;
-
-        return $this;
-    }
-    
     /**
      * Returns the salt generation closure (if any)
      * 
