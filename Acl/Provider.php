@@ -11,12 +11,12 @@ interface Provider
     const PERMISSION_DENY  = Acl::TYPE_DENY;
     
     public function getRoles();
-
-    public function getUserRoles(User $user);
-
-    public function getResources(RoleInterface $role);
     
     public function getResourcesAll();
-
-    public function getRoleResources($role);
+    
+    public function getResources(RoleInterface $role);
+    
+    public function getPermissions(RoleInterface $role);
+    
+    public function getPermissionsAll();
 }
