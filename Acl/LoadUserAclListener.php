@@ -6,7 +6,7 @@ use Fwk\Security\User\AclAware;
 
 class LoadUserAclListener
 {
-    public function onAuthenticationSuccess(SecurityEvent $event)
+    public function onUserLoaded(SecurityEvent $event)
     {
         $service    = $event->getService();
         $user       = $event->user;

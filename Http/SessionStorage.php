@@ -105,7 +105,7 @@ class SessionStorage implements StorageInterface
             $this->session->start();
         }
 
-        return $this->session->has(self::SESSION_STO_KEY . '-'. $this->namespace);
+        return !$this->session->has(self::SESSION_STO_KEY . '-'. $this->namespace);
     }
 
     /**

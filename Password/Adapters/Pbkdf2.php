@@ -145,4 +145,10 @@ class Pbkdf2 implements SaltedPassword
         }
         return $result == 0;
     }
+    
+    public function clearSalt()
+    {
+        unset($this->salt);
+        return $this;
+    }
 }

@@ -8,4 +8,6 @@ abstract class Events
     
     const AUTHENTICATION_ERROR      = 'authenticationError';
     const AUTHENTICATION_SUCCESS    = 'authenticationSuccess';
+    
+    const USER_LOADED               = 'userLoaded';
 }

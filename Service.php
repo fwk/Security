@@ -64,26 +64,15 @@ class Service extends Dispatcher
     public function getUser(Request $request = null)
     {
         if (!isset($this->user)) {
-            $this->notifyEvent(
-                Events::BEFORE_AUTHENTICATION, array('request' => $request)
-            );
-
-            $result = $this->authenticationManager->authenticate();
-            $this->notifyEvent(Events::AFTER_AUTHENTICATION, array(
-                'request'   => $request,
-                'result'    => $result
-            ));
-
-            if (!$result->isValid() || $result->getCode() !== ZendResult::SUCCESS) {
-                $this->notifyEvent(Events::AUTHENTICATION_ERROR, array(
-                    'request'   => $request,
-                    'result'    => $result,
-                    'messages'  => $result->getMessages()
-                ));
-                return null;
-            }
-
-            $identity = $result->getIdentity();
+            if (!$identity = $this->authenticationManager->getIdentity()) {
+                $result = $this->doAuthentication($request);
+                if (!$result) {
+                    return null;
+                }
+                
+                $identity = $result->getIdentity();
+            } 
+            
             if (isset($identity['identifier'])) {
                 $user = $this->userProvider->getById($identity['identifier']);
             } elseif (isset($identity['username'])) {
@@ -92,21 +81,13 @@ class Service extends Dispatcher
                     true
                 );
             } else {
-                $this->notifyEvent(Events::AUTHENTICATION_ERROR, array(
-                    'request'   => $request,
-                    'result'    => $result,
-                    'message'   => 'invalid identity recieved (no identifier or username)'
-                ));
                 return null;
             }
 
-            $this->notifyEvent(Events::AUTHENTICATION_SUCCESS, array(
-                'request'   => $request,
-                'result'    => $result,
-                'user'      => $user
-            ));
-
             $this->user = $user;
+            $this->notifyEvent(
+                Events::USER_LOADED, array('user' => $user)
+            );
         }
 
         return $this->user;
@@ -195,5 +176,34 @@ class Service extends Dispatcher
     protected function notifyEvent($eventName, array $data = array())
     {
         $this->notify(SecurityEvent::factory($eventName, $this, $data));
+    }
+    
+    protected function doAuthentication(Request $request = null)
+    {
+        $this->notifyEvent(
+            Events::BEFORE_AUTHENTICATION, array('request' => $request)
+        );
+
+        $result = $this->authenticationManager->authenticate();
+        $this->notifyEvent(Events::AFTER_AUTHENTICATION, array(
+            'request'   => $request,
+            'result'    => $result
+        ));
+
+        if (!$result->isValid() || $result->getCode() !== ZendResult::SUCCESS) {
+            $this->notifyEvent(Events::AUTHENTICATION_ERROR, array(
+                'request'   => $request,
+                'result'    => $result,
+                'messages'  => $result->getMessages()
+            ));
+            return null;
+        }
+        
+        $this->notifyEvent(Events::AUTHENTICATION_SUCCESS, array(
+            'request'   => $request,
+            'result'    => $result
+        ));
+        
+        return $result;
     }
 }
