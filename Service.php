@@ -9,6 +9,8 @@ use Fwk\Events\Dispatcher;
 use Zend\Authentication\Result as ZendResult;
 use Symfony\Component\HttpFoundation\Request;
 use Fwk\Security\User\AclAware;
+use Zend\Authentication\Adapter\AdapterInterface;
+use Fwk\Security\Exceptions\AuthenticationRequired;
 
 class Service extends Dispatcher
 {
@@ -60,17 +62,13 @@ class Service extends Dispatcher
     /**
      *
      * @return User
+     * @throws AuthenticationRequired If authentication is required ..
      */
     public function getUser(Request $request = null)
     {
         if (!isset($this->user)) {
             if (!$identity = $this->authenticationManager->getIdentity()) {
-                $result = $this->doAuthentication($request);
-                if (!$result) {
-                    return null;
-                }
-                
-                $identity = $result->getIdentity();
+                throw new AuthenticationRequired();
             } 
             
             if (isset($identity['identifier'])) {
@@ -178,8 +176,13 @@ class Service extends Dispatcher
         $this->notify(SecurityEvent::factory($eventName, $this, $data));
     }
     
-    protected function doAuthentication(Request $request = null)
-    {
+    public function authenticate(AdapterInterface $adapter = null, 
+        Request $request = null
+    ) {
+        if (null !== $adapter) {
+            $this->authenticationManager->setAdapter($adapter);
+        }
+        
         $this->notifyEvent(
             Events::BEFORE_AUTHENTICATION, array('request' => $request)
         );

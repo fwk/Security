@@ -3,6 +3,6 @@ namespace Fwk\Security\Exceptions;
 
 use Fwk\Security\Exception;
 
-class UserProviderException extends Exception
+class AuthenticationRequired extends Exception
 {
 }

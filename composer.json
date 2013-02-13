@@ -20,13 +20,13 @@
         "php": ">=5.3.0",
         "fwk/events": "dev-master",
         "fwk/xml": "dev-master",
-        "zendframework/zend-authentication": "2.*",
-        "zendframework/zend-permissions-acl": "2.*",
-        "zendframework/zend-crypt": "2.*"
+        "zendframework/zend-authentication": "dev-master",
+        "zendframework/zend-permissions-acl": "dev-master",
+        "zendframework/zend-crypt": "dev-master"
     },
     "require-dev": {
         "symfony/http-foundation": "dev-master",
-        "zendframework/zend-http": "2.*",
+        "zendframework/zend-http": "dev-master",
         "fwk/db": "dev-master"
     },
     "autoload": {
