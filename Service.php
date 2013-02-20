@@ -213,7 +213,10 @@ class Service extends Dispatcher
     public function deauthenticate(Request $request = null)
     {
         $this->notifyEvent(
-            Events::BEFORE_DEAUTHENTICATION, array('request' => $request)
+            Events::BEFORE_DEAUTHENTICATION, array(
+                'request'   => $request,
+                'identity'  => $this->getAuthenticationManager()->getIdentity()
+            )
         );
 
         try {
@@ -221,6 +224,7 @@ class Service extends Dispatcher
         } catch(\Exception $exp) {
             $this->notifyEvent(Events::DEAUTHENTICATION_ERROR, array(
                 'request'   => $request,
+                'identity'  => $this->getAuthenticationManager()->getIdentity(),
                 'messages'  => array($exp->getMessage())
             ));
             
