@@ -9,5 +9,9 @@ abstract class Events
     const AUTHENTICATION_ERROR      = 'authenticationError';
     const AUTHENTICATION_SUCCESS    = 'authenticationSuccess';
     
+    const BEFORE_DEAUTHENTICATION   = 'beforeDeauthentication';
+    const DEAUTHENTICATION_ERROR      = 'deauthenticationError';
+    const DEAUTHENTICATION_SUCCESS    = 'deauthenticationSuccess';
+    
     const USER_LOADED               = 'userLoaded';
 }

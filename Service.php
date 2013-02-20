@@ -209,4 +209,28 @@ class Service extends Dispatcher
         
         return $result;
     }
+    
+    public function deauthenticate(Request $request = null)
+    {
+        $this->notifyEvent(
+            Events::BEFORE_DEAUTHENTICATION, array('request' => $request)
+        );
+
+        try {
+            $this->authenticationManager->clearIdentity();
+        } catch(\Exception $exp) {
+            $this->notifyEvent(Events::DEAUTHENTICATION_ERROR, array(
+                'request'   => $request,
+                'messages'  => array($exp->getMessage())
+            ));
+            
+            return false;
+        }
+        
+        $this->notifyEvent(Events::DEAUTHENTICATION_SUCCESS, array(
+            'request'   => $request
+        ));
+        
+        return true;
+    }
 }
