@@ -71,7 +71,7 @@ class Service extends Dispatcher
                 throw new AuthenticationRequired();
             } 
             
-            if (isset($identity['identifier'])) {
+            if (isset($identity['identifier']) && !empty($identity['identifier'])) {
                 $user = $this->userProvider->getById($identity['identifier']);
             } elseif (isset($identity['username'])) {
                 $user = $this->userProvider->getByUsername(
@@ -221,6 +221,7 @@ class Service extends Dispatcher
 
         try {
             $this->authenticationManager->clearIdentity();
+            $this->user = null;
         } catch(\Exception $exp) {
             $this->notifyEvent(Events::DEAUTHENTICATION_ERROR, array(
                 'request'   => $request,
