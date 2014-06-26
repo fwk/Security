@@ -69,7 +69,7 @@ class Service extends Dispatcher
         if (!isset($this->user)) {
             if (!$identity = $this->authenticationManager->getIdentity()) {
                 throw new AuthenticationRequired();
-            } 
+            }
             
             if (isset($identity['identifier']) && !empty($identity['identifier'])) {
                 $user = $this->userProvider->getById($identity['identifier']);
@@ -89,6 +89,11 @@ class Service extends Dispatcher
         }
 
         return $this->user;
+    }
+
+    public function hasUser()
+    {
+        return ($this->user instanceof User);
     }
 
     /**
